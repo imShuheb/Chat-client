@@ -7,7 +7,7 @@ const ChatRoom = () => {
   const [targetUserId, setTargetUserId] = useState('663784188b83b504b972dbf1');
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState([]);
-  const [roomId, setRoomId] = useState(null); // State to store the room ID
+  const [roomId, setRoomId] = useState(null);
 
   useEffect(() => {
     const newSocket = io('http://localhost:8000/events');
@@ -22,10 +22,9 @@ const ChatRoom = () => {
         setChat([...chat, data]);
       });
 
-      // Listen for the roomJoined event
       socket.on('roomJoined', (roomId) => {
         console.log('Room Joined:', roomId);
-        setRoomId(roomId); // Store the room ID in state
+        setRoomId(roomId);
       });
     }
   }, [socket, chat]);
@@ -47,6 +46,10 @@ const ChatRoom = () => {
       console.log('Please provide a message and make sure you have joined a room');
     }
   };
+
+  const handleEndChat = () => {
+    socket.emit('end', { roomId });
+  }
 
   return (
     <div>
@@ -80,6 +83,7 @@ const ChatRoom = () => {
           onChange={(e) => setMessage(e.target.value)}
         />
         <button onClick={handleMessageSend}>Send</button>
+        <button onClick={handleEndChat}>end</button>
       </div>
     </div>
   );
