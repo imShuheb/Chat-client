@@ -1,92 +1,87 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const ChatRoom = () => {
+const Chat = () => {
   const [socket, setSocket] = useState(null);
-  const [userId, setUserId] = useState('66365c6317cd2a0f65529082');
-  const [targetUserId, setTargetUserId] = useState('663784188b83b504b972dbf1');
   const [message, setMessage] = useState('');
-  const [chat, setChat] = useState([]);
-  const [roomId, setRoomId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [roomId, setRoomId] = useState('');
+  const [userId, setUserId] = useState('');
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8000/events');
-    setSocket(newSocket);
+    const socket = io('http://localhost:8000/chat');
 
-    return () => newSocket.close();
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('message', (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('message', (data) => {
-        setChat([...chat, data]);
+  const joinRoom = () => {
+    if (socket && roomId && userId) {
+      socket.emit('joinRoom', { roomId, userId }, (success) => {
+        if (success) {
+          console.log('Joined room:', roomId);
+        } else {
+          console.error('Failed to join room:', roomId);
+        }
       });
-
-      socket.on('roomJoined', (roomId) => {
-        console.log('Room Joined:', roomId);
-        setRoomId(roomId);
-      });
-    }
-  }, [socket, chat]);
-
-  const handleJoinRoom = () => {
-    if (socket && userId && targetUserId) {
-      socket.emit('join', { userId, targetUserId });
-    } else {
-      console.log('Please provide user ID and target user ID');
     }
   };
 
-  const handleMessageSend = () => {
+  const sendMessage = () => {
     if (socket && message && roomId) {
-      socket.emit('message', { roomId, message });
-      setChat([...chat, { user: userId, message }]);
+      socket.emit('sendMessage', { roomId, userId, message });
       setMessage('');
-    } else {
-      console.log('Please provide a message and make sure you have joined a room');
     }
   };
-
-  const handleEndChat = () => {
-    socket.emit('end', { roomId });
-  }
 
   return (
     <div>
+      <h1>Chat Application</h1>
       <div>
         <input
           type="text"
-          placeholder="Your User ID"
+          placeholder="Room ID"
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
         />
-        <input
-          type="text"
-          placeholder="Target User ID"
-          value={targetUserId}
-          onChange={(e) => setTargetUserId(e.target.value)}
-        />
-        <button onClick={handleJoinRoom}>Join Room</button>
+        <button onClick={joinRoom}>Join Room</button>
       </div>
       <div>
-        <div style={{ height: '300px', overflowY: 'scroll' }}>
-          {chat.map((entry, index) => (
-            <div key={index}>
-              <strong>{entry.user}:</strong> {entry.message}
-            </div>
-          ))}
-        </div>
         <input
           type="text"
           placeholder="Type your message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button onClick={handleMessageSend}>Send</button>
-        <button onClick={handleEndChat}>end</button>
+        <button onClick={sendMessage}>Send Message</button>
+      </div>
+      <div>
+        <h2>Messages</h2>
+        <ul>
+          {messages.map((msg, index) => (
+            <li key={index}>{msg.userId}: {msg.message}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
 };
 
-export default ChatRoom;
+export default Chat;

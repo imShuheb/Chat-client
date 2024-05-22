@@ -42,7 +42,6 @@ const Chat = () => {
             } else {
                 setRoomId(data.roomId);
                 setError('');
-                fetchRooms();
             }
         });
     };
