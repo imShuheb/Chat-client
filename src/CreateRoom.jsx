@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 const Chat = () => {
-    const [userId, setUserId] = useState('664c87992b1c798c1eca0934');
+    const [userId, setUserId] = useState('664f35d7901e869a2a8b7725');
     const [targetUserId, setTargetUserId] = useState('664b1a7e2e1ed2385c6d6bed');
     const [roomId, setRoomId] = useState('');
     const [rooms, setRooms] = useState([]);

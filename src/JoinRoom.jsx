@@ -35,7 +35,8 @@ const Chat = () => {
 
     const joinRoom = () => {
         if (socket && roomId && userId) {
-            socket.emit('joinRoom', { roomId, userId }, (success) => {
+            const socketId = socket.id; // Get the socket ID
+            socket.emit('joinRoom', { roomId, userId, socketId }, (success) => {
                 getRoomUsers();
                 if (success) {
                     console.log('Joined room:', roomId);
@@ -46,10 +47,14 @@ const Chat = () => {
         }
     };
 
+
     const getRoomUsers = () => {
         if (socket && roomId) {
-            socket.emit('getRoomUsers', { roomId }, (usersCount) => {
+            const socketId = socket.id;
+            console.log(socket)
+            socket.emit('getUsersInRoom', { roomId, socketId }, (usersCount) => {
                 setRoomUsers(usersCount);
+                console.log(usersCount)
             });
         }
     };
