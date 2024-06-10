@@ -35,7 +35,7 @@ const Chat = () => {
 
     const joinRoom = () => {
         if (socket && roomId && userId) {
-            const socketId = socket.id; // Get the socket ID
+            const socketId = socket.id; 
             socket.emit('joinRoom', { roomId, userId, socketId }, (success) => {
                 getRoomUsers();
                 if (success) {
@@ -59,9 +59,12 @@ const Chat = () => {
         }
     };
 
+    console.log(message)
+
     const sendMessage = () => {
+        const sendMessage = { text: message, sender: 'shuheb', timestamp: new Date().toISOString() };
         if (socket && message && roomId) {
-            socket.emit('sendMessage', { roomId, userId, message });
+            socket.emit('sendMessage', { roomId, message: sendMessage, socketId: socket.id });
             setMessage('');
         }
     };
@@ -102,9 +105,14 @@ const Chat = () => {
             <div>
                 <h2>Messages</h2>
                 <ul>
-                    {messages.map((msg, index) => (
-                        <li key={index}>{msg.userId}: {msg.message}</li>
-                    ))}
+                    <ul>
+                        {messages.map((msg, index) => (
+                            <li key={index}>
+                                {msg.userId}: {msg.message.text} {/* Render the 'text' property of the 'message' object */}
+                            </li>
+                        ))}
+                    </ul>
+
                 </ul>
             </div>
         </div>
