@@ -35,7 +35,7 @@ const Chat = () => {
 
     const joinRoom = () => {
         if (socket && roomId && userId) {
-            const socketId = socket.id; 
+            const socketId = socket.id;
             socket.emit('joinRoom', { roomId, userId, socketId }, (success) => {
                 getRoomUsers();
                 if (success) {
@@ -68,7 +68,9 @@ const Chat = () => {
             setMessage('');
         }
     };
-
+    const handleEndChat = () => {
+        socket.emit('endChat', roomId);
+    };
     return (
         <div>
             <h1>Chat Application</h1>
@@ -97,6 +99,7 @@ const Chat = () => {
                 <button onClick={sendMessage}>Send Message</button>
                 <button onClick={getChat}>getList</button>
                 <button onClick={getRoomUsers}>getRoomUsers</button>
+                <button onClick={handleEndChat}>endChat</button>
             </div>
             <div>
                 <h2>Room Information</h2>
@@ -108,7 +111,7 @@ const Chat = () => {
                     <ul>
                         {messages.map((msg, index) => (
                             <li key={index}>
-                                {msg.userId}: {msg.message.text} {/* Render the 'text' property of the 'message' object */}
+                                {msg.userId}: {msg.message.text}
                             </li>
                         ))}
                     </ul>

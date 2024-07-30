@@ -5,14 +5,16 @@ import './App.css'
 import ChatRoom from './Chat'
 import JoinRoom from './JoinRoom'
 import CreateRoom from './CreateRoom'
+import Checkout from './Checkout'
 
 function App() {
 
   return (
     <>
       {/* <ChatRoom /> */}
-      <CreateRoom />
-      <JoinRoom />
+      {/* <CreateRoom />
+      <JoinRoom /> */}
+      <Checkout />
     </>
   )
 }
