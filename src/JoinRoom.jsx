@@ -7,6 +7,7 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [roomId, setRoomId] = useState('');
     const [userId, setUserId] = useState('');
+    const [token, settoken] = useState('');
     const [roomUsers, setRoomUsers] = useState(0);
 
     useEffect(() => {
@@ -18,6 +19,13 @@ const Chat = () => {
 
         socket.on('message', (message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
+        });
+
+        socket.on('roomFull', (message) => {
+            console.log(message)
+        });
+        socket.on('memberCountUpdated', (message) => {
+            console.log(message)
         });
 
         setSocket(socket);
@@ -33,11 +41,14 @@ const Chat = () => {
         })
     }
 
+    // let token = 'f7e81f23-26ee-41a3-b803-1ece96ee75d7'
+
     const joinRoom = () => {
         if (socket && roomId && userId) {
             const socketId = socket.id;
-            socket.emit('joinRoom', { roomId, userId, socketId }, (success) => {
+            socket.emit('joinRoom', { roomId, userId, socketId, token }, (success) => {
                 getRoomUsers();
+                console.log(success)
                 if (success) {
                     console.log('Joined room:', roomId);
                 } else {
@@ -51,7 +62,6 @@ const Chat = () => {
     const getRoomUsers = () => {
         if (socket && roomId) {
             const socketId = socket.id;
-            console.log(socket)
             socket.emit('getUsersInRoom', { roomId, socketId }, (usersCount) => {
                 setRoomUsers(usersCount);
                 console.log(usersCount)
@@ -86,6 +96,12 @@ const Chat = () => {
                     placeholder="User ID"
                     value={userId}
                     onChange={(e) => setUserId(e.target.value)}
+                />
+                 <input
+                    type="text"
+                    placeholder="User ID"
+                    value={token}
+                    onChange={(e) => settoken(e.target.value)}
                 />
                 <button onClick={joinRoom}>Join Room</button>
             </div>

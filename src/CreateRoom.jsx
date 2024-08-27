@@ -36,7 +36,7 @@ const Chat = () => {
     const type = 'student'
     const handleCreateRoom = () => {
         // Emit createRoom event to the server
-        socket.emit('createRoom', { userId, targetUserId, type }, (data) => {
+        socket.emit('createRoom', { userId, targetUserId, type, ip: '192.168.0.1' }, (data) => {
             if (data.error) {
                 setError(data.error);
             } else {
